@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>TV shows</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" 
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row m-1 p-2">
+                <div class="col-10">
+                    <h1 class="fs-1">Show Comments</h1>
+                </div>
+                <div class="col-2 d-flex justify-content-between">
+                    <a href="/shows">TVShows</a>
+                    <a href="/logout">logout</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Title:</td>
+                            <td>{{show.title}}</td>
+                        </tr>
+                        <tr>
+                            <td>Network:</td>
+                            <td>{{show.network}}</td>
+                        </tr>
+                        <tr>
+                            <td>Release Date:</td>
+                            <td>{{show.release_date}}</td>
+                        </tr>
+                        <tr>
+                            <td>Description:</td>
+                            <td>{{show.comment}}</td>
+                        </tr>
+                        <tr>
+                            <td>Last Update:</td>
+                            <td>{{show.updated_at}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5 d-flex justify-content-between">
+                    <p>Post a comment</p>
+                    <form action="/post_comment" method="post" class="d-flex justify-content-between">
+                        {% csrf_token %}
+                        <textarea name="comment" cols="30" rows="1"></textarea>
+                        <input type="hidden" name="show_id" value="{{show.id}}">
+                        <input type="submit" value="Post comment">
+                    </form>
+                </div>
+            </div>
+            <div class="row m-3 p-1">
+                <div class="col-12">
+                    {%for comment in comments.all reversed%}
+                        {% if comment.show.id == show.id%}
+                            <p class="fw-bold">{{comment.user.first_name}} {{comment.user.last_name}} - {{comment.created_at}}</p>
+                            <div class="row ">
+                                <div class="col-8 border message full-width d-flex justify-content-between">
+                                    <p>{{comment.comment }}</p>
+                                    {%if comment.user.id == request.session.user_id%}
+                                        <a href="/delete_show_comment/{{comment.show.id}}/{{comment.id}}">delete</a>
+                                    {%endif%}
+                                </div>
+                                
+                            </div>
+                        {%endif%}
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
