@@ -133,3 +133,16 @@ def create_show_comment(postData,user_id):
 def delete_show_comment(comment_id):
     comment = Comment.objects.get(id=comment_id)
     comment.delete()
+
+def update_show(postData,show_id):
+    show = get_show_by_id(show_id)
+    show_title = postData['title']
+    show_network = postData['network']
+    show_release_date = postData['release_date']
+    show_description = postData['description']
+    # update on database
+    show.title = show_title
+    show.network = show_network
+    show.release_date = show_release_date
+    show.comment = show_description
+    show.save()

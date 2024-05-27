@@ -74,15 +74,14 @@ def create_new_show(request):
     if 'user_id' in request.session:
         if request.method == 'POST':
             new_show_error = models.Show.objects.basic_validator_show(request.POST)
-            if len(new_show_error) > 0:
+            show = models.get_show_by_title(request.POST)
+            if len(new_show_error) > 0 :
                 for key, value in new_show_error.items():
                     messages.error(request, value,extra_tags='show_error')
-            show = models.get_show_by_title(request.POST)
-            print(show)
             if show:
                 messages.error(request,'Show is Already Recommend',extra_tags='show_error')
-                return redirect(add_show)
-            models.create_show(request.POST,request.session['user_id'])
+            return redirect('shows/new')
+        models.create_show(request.POST,request.session['user_id'])
     return redirect(shows_page)
 
 def delete_show(request,show_id):
@@ -106,9 +105,15 @@ def post_edit_show(request,show_id):
             if len(edit_show_error) > 0:
                 for key, value in edit_show_error.items():
                     messages.error(request, value,extra_tags='edit_show_error')
-            if models.check_show_title_unique(request.POST,show_id):
-                messages.error(request,'Show is Already Recommend',extra_tags='edit_show_error')
-                return redirect('/shows/edit/'+str(show_id))
+                # if models.check_show_title_unique(request.POST,show_id):
+                #     messages.error(request,'Show is Already Recommend',extra_tags='edit_show_error')
+            show = models.get_show_by_id(show_id)
+            if show.title != request.POST['title']:
+                check_uniqe = models.get_show_by_title(request.POST)
+                if check_uniqe:
+                    messages.error(request,'Show is Already Recommend',extra_tags='edit_show_error')
+                    return redirect('/shows/edit/'+str(show_id))
+            models.update_show(request.POST,show_id)
             return redirect(shows_page)
     return redirect('/')
 
